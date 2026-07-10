@@ -1,1 +1,1 @@
-
+The Smart Waste Management System is a web-based application designed to improve the waste collection process. It allows users to report garbage, view collection schedules, and track complaint status. Municipal authorities can monitor waste reports, assign collection tasks, and update the status of each request. The system helps keep cities clean by ensuring timely waste collection and reducing manual work.
