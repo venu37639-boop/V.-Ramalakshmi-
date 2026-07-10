@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rot, Reuse, Rebuild — Real Waste Management Solutions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --soil: #2b2118;
+    --soil-2: #4a3826;
+    --leaf-dark: #1f3d2b;
+    --leaf: #3f6b4a;
+    --leaf-light: #7fa373;
+    --paper: #eee6d3;
+    --paper-2: #e2d6ba;
+    --amber: #c98a2c;
+    --rust: #a4442a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background: var(--paper);
+    color: var(--soil);
+    font-family: 'Space Grotesk', sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.02em; }
+  a{color:inherit;}
+  img{max-width:100%; display:block;}
+
+  /* ---------- NAV ---------- */
+  nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:1.1rem 6vw;
+    background:rgba(238,230,211,0.9);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid rgba(43,33,24,0.12);
+  }
+  .brand{font-family:'Fraunces',serif; font-weight:700; font-size:1.15rem;}
+  .brand span{color:var(--leaf-dark);}
+  nav .links{display:flex; gap:1.8rem; font-size:0.85rem;}
+  nav .links a{text-decoration:none; opacity:0.75; transition:opacity .2s;}
+  nav .links a:hover{opacity:1;}
+  @media(max-width:680px){ nav .links{display:none;} }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:9vh 6vw 10vh;
+    background:
+      radial-gradient(ellipse at 80% -10%, rgba(127,163,115,0.35), transparent 55%),
+      var(--paper);
+    overflow:hidden;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    text-transform:uppercase; font-size:0.72rem; letter-spacing:0.14em;
+    color:var(--rust); margin-bottom:1.4rem; display:flex; align-items:center; gap:.6rem;
+  }
+  .eyebrow::before{content:''; width:22px; height:1px; background:var(--rust); display:inline-block;}
+  .hero h1{
+    font-size:clamp(2.4rem, 6vw, 4.6rem);
+    max-width:14ch;
+    line-height:1.02;
+    color:var(--leaf-dark);
+  }
+  .hero h1 em{ font-style:italic; color:var(--rust); }
+  .hero p.lead{
+    max-width:46ch; margin-top:1.6rem; font-size:1.1rem; color:var(--soil-2);
+  }
+  .hero-meta{
+    margin-top:3rem; display:flex; gap:3rem; flex-wrap:wrap;
+  }
+  .hero-meta div{border-left:2px solid var(--leaf); padding-left:0.9rem;}
+  .hero-meta .num{font-family:'Fraunces',serif; font-size:1.9rem; font-weight:600; color:var(--leaf-dark);}
+  .hero-meta .lbl{font-size:0.78rem; color:var(--soil-2); max-width:20ch;}
+
+  /* ---------- DECOMPOSITION TIMELINE (signature element) ---------- */
+  .decomp{
+    padding:7vh 6vw; background:var(--leaf-dark); color:var(--paper);
+    position:relative;
+  }
+  .decomp h2{ color:var(--paper); font-size:clamp(1.6rem,3.6vw,2.4rem); max-width:20ch;}
+  .decomp .sub{color:var(--leaf-light); margin-top:0.6rem; max-width:52ch; font-size:0.98rem;}
+  .timeline{
+    margin-top:3.5rem;
+    display:flex; flex-direction:column; gap:0;
+    border-top:1px solid rgba(238,230,211,0.2);
+  }
+  .t-row{
+    display:grid;
+    grid-template-columns: 1fr auto 90px;
+    align-items:center;
+    gap:1rem;
+    padding:1rem 0;
+    border-bottom:1px solid rgba(238,230,211,0.2);
+  }
+  .t-row .t-name{font-size:1rem;}
+  .t-row .t-bar-wrap{ position:relative; height:6px; background:rgba(238,230,211,0.15); border-radius:4px; overflow:hidden; }
+  .t-row .t-bar{ position:absolute; left:0; top:0; bottom:0; background:var(--amber); border-radius:4px; width:0%; transition:width 1.4s cubic-bezier(.2,.8,.2,1); }
+  .t-row.visible .t-bar{ width: var(--w); }
+  .t-row .t-time{ text-align:right; font-family:'JetBrains Mono',monospace; font-size:0.82rem; color:var(--leaf-light); }
+  .t-row.long .t-bar{ background:var(--rust); }
+  @media(max-width:680px){
+    .t-row{grid-template-columns:1fr; gap:0.4rem;}
+    .t-row .t-time{text-align:left;}
+  }
+
+  /* ---------- SOLUTIONS GRID ---------- */
+  .solutions{ padding:9vh 6vw; }
+  .section-head{ max-width:56ch; margin-bottom:3.5rem; }
+  .section-head .eyebrow{margin-bottom:1rem;}
+  .section-head h2{ font-size:clamp(1.8rem,4vw,2.6rem); color:var(--leaf-dark); }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:rgba(43,33,24,0.15);
+    border:1px solid rgba(43,33,24,0.15);
+  }
+  @media(max-width:900px){ .grid{grid-template-columns:repeat(2,1fr);} }
+  @media(max-width:600px){ .grid{grid-template-columns:1fr;} }
+
+  .card{
+    background:var(--paper);
+    padding:2.2rem 1.8rem;
+    position:relative;
+    transition:background .25s;
+  }
+  .card:hover{ background:var(--paper-2); }
+  .card .tag{
+    font-family:'JetBrains Mono',monospace; font-size:0.72rem;
+    color:var(--rust); text-transform:uppercase; letter-spacing:0.1em;
+  }
+  .card h3{ font-size:1.25rem; margin-top:0.7rem; color:var(--leaf-dark);}
+  .card p{ margin-top:0.7rem; font-size:0.92rem; color:var(--soil-2); }
+
+  /* ---------- CASE STUDY ---------- */
+  .case{
+    padding:9vh 6vw; background:var(--soil); color:var(--paper);
+  }
+  .case-inner{ display:grid; grid-template-columns:1fr 1fr; gap:4rem; align-items:start;}
+  @media(max-width:800px){ .case-inner{grid-template-columns:1fr; gap:2.5rem;} }
+  .case h2{ color:var(--paper); font-size:clamp(1.7rem,3.6vw,2.5rem); }
+  .case .sub{color:var(--leaf-light); margin-top:0.8rem;}
+  .stat-list{ display:flex; flex-direction:column; gap:1.6rem; }
+  .stat-list .row{ display:flex; justify-content:space-between; border-bottom:1px solid rgba(238,230,211,0.15); padding-bottom:1rem;}
+  .stat-list .row .k{ color:var(--leaf-light); font-size:0.9rem; }
+  .stat-list .row .v{ font-family:'Fraunces',serif; font-weight:600; font-size:1.3rem; }
+
+  /* ---------- 3R ---------- */
+  .principles{ padding:9vh 6vw; }
+  .p-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:2rem; margin-top:3rem; }
+  @media(max-width:800px){ .p-grid{grid-template-columns:1fr;} }
+  .p-card{
+    border:1px solid rgba(43,33,24,0.2);
+    padding:2rem;
+    position:relative;
+  }
+  .p-card .big{
+    font-family:'Fraunces',serif; font-size:3.4rem; color:var(--leaf-light);
+    opacity:0.6; line-height:1;
+  }
+  .p-card h3{ margin-top:1rem; color:var(--leaf-dark); }
+  .p-card p{ margin-top:0.6rem; font-size:0.92rem; color:var(--soil-2); }
+
+  /* ---------- ACTION CHECKLIST ---------- */
+  .action{ padding:9vh 6vw; background:var(--paper-2); }
+  .checklist{ max-width:640px; margin-top:2.5rem; display:flex; flex-direction:column; }
+  .check-item{
+    display:flex; gap:1rem; align-items:flex-start;
+    padding:1.1rem 0; border-bottom:1px solid rgba(43,33,24,0.15);
+  }
+  .check-item .box{
+    width:20px; height:20px; border:2px solid var(--leaf-dark); flex-shrink:0; margin-top:2px;
+    position:relative; cursor:pointer;
+  }
+  .check-item .box.on{ background:var(--leaf-dark); }
+  .check-item .box.on::after{
+    content:'✓'; color:var(--paper); position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:12px;
+  }
+  .check-item p{ font-size:0.98rem; }
+  .check-item.done p{ text-decoration:line-through; opacity:0.5; }
+
+  footer{
+    padding:4rem 6vw 3rem; background:var(--leaf-dark); color:var(--leaf-light);
+    font-size:0.85rem; display:flex; justify-content:space-between; flex-wrap:wrap; gap:1rem;
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">rot<span>/</span>reuse<span>/</span>rebuild</div>
+  <div class="links">
+    <a href="#decomp">Decay Clock</a>
+    <a href="#solutions">Solutions</a>
+    <a href="#case">Case Study</a>
+    <a href="#principles">3R</a>
+    <a href="#action">Start Today</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="eyebrow">Field-tested, not theoretical</div>
+  <h1>Waste isn't a problem to <em>dispose of</em>. It's a problem to <em>redesign</em>.</h1>
+  <p class="lead">Real neighborhoods, real households, and real cities have already cut their landfill waste by 70–90%. Here's exactly how — segregation, composting, biogas, recycling, and the systems that made it stick.</p>
+  <div class="hero-meta">
+    <div><div class="num">2.01B</div><div class="lbl">tonnes of municipal solid waste generated globally each year</div></div>
+    <div><div class="num">33%</div><div class="lbl">of that waste is openly dumped or burned — the part these solutions target</div></div>
+    <div><div class="num">90%</div><div class="lbl">waste diversion achieved by the best-run zero-waste towns</div></div>
+  </div>
+</section>
+
+<section class="decomp" id="decomp">
+  <h2>Before solving it, see it — the decay clock</h2>
+  <p class="sub">Every item you throw away runs on its own clock. Segregating at source works because it routes each item to the right clock instead of one landfill.</p>
+  <div class="timeline" id="timeline">
+    <div class="t-row" data-w="4%"><div class="t-name">Banana / vegetable peel</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">2–5 weeks</div></div>
+    <div class="t-row" data-w="8%"><div class="t-name">Paper</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">2–6 weeks</div></div>
+    <div class="t-row" data-w="14%"><div class="t-name">Cotton cloth</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">2–5 months</div></div>
+    <div class="t-row" data-w="22%"><div class="t-name">Cigarette butt</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">10 years</div></div>
+    <div class="t-row long" data-w="45%"><div class="t-name">Tin / aluminium can</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">80–200 years</div></div>
+    <div class="t-row long" data-w="70%"><div class="t-name">Plastic bottle</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">450 years</div></div>
+    <div class="t-row long" data-w="95%"><div class="t-name">Glass bottle</div><div class="t-bar-wrap"><div class="t-bar"></div></div><div class="t-time">Never fully — 1M+ years</div></div>
+  </div>
+</section>
+
+<section class="solutions" id="solutions">
+  <div class="section-head">
+    <div class="eyebrow">What actually works</div>
+    <h2>Six solutions, already running at scale</h2>
+  </div>
+  <div class="grid">
+    <div class="card">
+      <div class="tag">01 · Source</div>
+      <h3>Segregation at the bin</h3>
+      <p>Split waste into wet (kitchen, garden), dry (plastic, paper, metal), and hazardous (batteries, medicine, e-waste) right where it's generated. Every downstream solution below depends on this one habit.</p>
+    </div>
+    <div class="card">
+      <div class="tag">02 · Home</div>
+      <h3>Home & community composting</h3>
+      <p>A simple pot, pit, or bokashi bin turns kitchen waste into usable soil in 30–45 days. Apartment complexes running shared composters have cut their outgoing wet waste to near zero.</p>
+    </div>
+    <div class="card">
+      <div class="tag">03 · Energy</div>
+      <h3>Biogas from kitchen waste</h3>
+      <p>Small biogas plants (even household-sized units) digest food waste anaerobically, producing cooking gas and slurry fertilizer. Common now in schools, hostels, and market complexes.</p>
+    </div>
+    <div class="card">
+      <div class="tag">04 · Materials</div>
+      <h3>Dry waste recovery & recycling</h3>
+      <p>Dry waste collection centers sort plastic, paper, glass, and metal for sale to recyclers — turning a cost center into a small revenue stream for local waste-picker cooperatives.</p>
+    </div>
+    <div class="card">
+      <div class="tag">05 · Hazard</div>
+      <h3>Dedicated e-waste & battery drop-offs</h3>
+      <p>Phones, batteries, and CFL bulbs need separate authorized collection points, since they leach heavy metals if landfilled or burned with regular trash.</p>
+    </div>
+    <div class="card">
+      <div class="tag">06 · Behaviour</div>
+      <h3>Pay-as-you-throw + fines</h3>
+      <p>Charging households by the bag for mixed (unsegregated) waste, while collecting segregated waste free, is the single policy lever that has moved segregation rates fastest.</p>
+    </div>
+  </div>
+</section>
+
+<section class="case" id="case">
+  <div class="case-inner">
+    <div>
+      <div class="eyebrow" style="color:var(--leaf-light)">Proof it scales</div>
+      <h2>Indore: from India's dirtiest to its cleanest city</h2>
+      <p class="sub">Indore rebuilt its entire waste system around one rule: 100% source segregation into six categories, collected by GPS-tracked door-to-door vehicles, processed at a dedicated bio-CNG plant fed by the city's own wet waste.</p>
+    </div>
+    <div class="stat-list">
+      <div class="row"><div class="k">Door-to-door collection coverage</div><div class="v">100%</div></div>
+      <div class="row"><div class="k">Waste processed, not landfilled</div><div class="v">~95%</div></div>
+      <div class="row"><div class="k">Bio-CNG produced daily from wet waste</div><div class="v">~17,000 kg</div></div>
+      <div class="row"><div class="k">Consecutive years as India's cleanest city</div><div class="v">7×</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="principles" id="principles">
+  <div class="section-head">
+    <div class="eyebrow">The underlying logic</div>
+    <h2>Every solution above is just 3R, applied</h2>
+  </div>
+  <div class="p-grid">
+    <div class="p-card">
+      <div class="big">R1</div>
+      <h3>Reduce</h3>
+      <p>Refuse single-use plastic, buy in bulk, choose repairable products. The cheapest waste to manage is the waste never created.</p>
+    </div>
+    <div class="p-card">
+      <div class="big">R2</div>
+      <h3>Reuse</h3>
+      <p>Refill containers, donate usable items, repair before replacing. Extends an item's working life before it ever becomes waste.</p>
+    </div>
+    <div class="p-card">
+      <div class="big">R3</div>
+      <h3>Recycle & Recover</h3>
+      <p>For what's left: segregate, compost the organic share, recycle the dry share, and safely dispose of the hazardous share.</p>
+    </div>
+  </div>
+</section>
+
+<section class="action" id="action">
+  <div class="section-head">
+    <div class="eyebrow">This week</div>
+    <h2>A checklist you can actually finish</h2>
+  </div>
+  <div class="checklist" id="checklist">
+    <div class="check-item"><div class="box"></div><p>Get two bins — one for wet waste, one for dry waste</p></div>
+    <div class="check-item"><div class="box"></div><p>Start a small compost pot for kitchen scraps</p></div>
+    <div class="check-item"><div class="box"></div><p>Find your city's nearest e-waste / battery drop-off point</p></div>
+    <div class="check-item"><div class="box"></div><p>Rinse and store dry recyclables separately until collection day</p></div>
+    <div class="check-item"><div class="box"></div><p>Say no to one single-use plastic item a day for a week</p></div>
+  </div>
+</section>
+
+<footer>
+  <div>rot / reuse / rebuild</div>
+  <div>Made for people who want a system that works, not just a bin that closes.</div>
+</footer>
+
+<script>
+  // Timeline scroll reveal
+  const rows = document.querySelectorAll('.t-row');
+  rows.forEach(r => r.style.setProperty('--w', r.dataset.w));
+  const io = new IntersectionObserver(entries=>{
+    entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); } });
+  },{threshold:0.4});
+  rows.forEach(r=>io.observe(r));
+
+  // Checklist toggle
+  document.querySelectorAll('.check-item').forEach(item=>{
+    const box = item.querySelector('.box');
+    box.addEventListener('click', ()=>{
+      box.classList.toggle('on');
+      item.classList.toggle('done');
+    });
+  });
+</script>
+
+</body>
+</html>
